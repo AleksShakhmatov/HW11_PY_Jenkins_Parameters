@@ -1,12 +1,13 @@
-import os
 
+import os
 import pytest
+from dotenv import load_dotenv
+from selene import browser
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selene import Browser, Config
-from dotenv import load_dotenv
 
 from utils import attach
+
 
 DEFAULT_BROWSER_VERSION = "100.0"
 
@@ -45,12 +46,16 @@ def setup_browser(request):
         command_executor=f"https://{login}:{password}@selenoid.autotests.cloud/wd/hub",
         options=options
     )
-    browser = Browser(Config(driver))
 
+    browser.config.window_width = 1920
+    browser.config.window_height = 1080
+    browser.config.base_url = 'https://demoqa.com/'
+    browser.config.driver = driver
     yield browser
 
-    attach.add_html(browser)
     attach.add_screenshot(browser)
     attach.add_logs(browser)
+    attach.add_html(browser)
     attach.add_video(browser)
+
     browser.quit()
